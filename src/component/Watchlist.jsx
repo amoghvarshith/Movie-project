@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import genre from '../utility/genre'
 
 function Watchlist({ watchlist, handleRemoveFromWatchList }) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -11,7 +12,7 @@ function Watchlist({ watchlist, handleRemoveFromWatchList }) {
   const filteredWatchlist = sortedWatchlist.filter(movie =>
     movie.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
+ 
   const sortIncreasingByRating = () => {
     const sortedIncreasing = [...sortedWatchlist].sort((movieA, movieB) => movieA.vote_average - movieB.vote_average);
     setSortedWatchlist(sortedIncreasing);
@@ -96,6 +97,7 @@ function Watchlist({ watchlist, handleRemoveFromWatchList }) {
                 </td>
                 <td>{movieObj.vote_average}</td>
                 <td>{movieObj.popularity}</td>
+                <td>{genre[movieObj.genre_ids[0]]}</td>
                 <td>Action</td>
                 <td
                   className='text-red-800 cursor-pointer'
