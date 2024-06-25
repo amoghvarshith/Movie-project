@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Navbar from './component/Navbar';
 import Movies from './component/Movies';
 import Watchlist from './component/Watchlist';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import History from './component/History';
 import Banner from './component/Banner';
 
 function App() {
@@ -21,6 +22,13 @@ function App() {
     });
     setWatchlist(filteredWatchList);
     console.log(filteredWatchList);
+
+    // Add to deleted history only if it doesn't already exist
+    let deletedHistory = JSON.parse(localStorage.getItem('deletedHistory')) || [];
+    if (!deletedHistory.some(movie => movie.id === movieObj.id)) {
+      deletedHistory = [...deletedHistory, movieObj];
+      localStorage.setItem('deletedHistory', JSON.stringify(deletedHistory));
+    }
   };
 
   useEffect(() => {
@@ -52,6 +60,10 @@ function App() {
           <Route
             path="/Watchlist"
             element={<Watchlist watchlist={watchlist} handleRemoveFromWatchList={handleRemoveFromWatchList} setWatchlist={setWatchlist} />}
+          />
+          <Route
+            path="/History"
+            element={<History />}
           />
         </Routes>
       </BrowserRouter>

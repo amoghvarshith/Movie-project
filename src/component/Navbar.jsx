@@ -12,6 +12,8 @@ const Navbar = () => {
 
       <Link to='/' className='text-blue-800 text-2xl'>Movies</Link>
       <Link to='/Watchlist' className='text-blue-800 text-2xl'>Watchlist</Link>
+      <Link to='/History' className='text-blue-800 text-2xl'>History</Link>
+
     </div>
   );
 }

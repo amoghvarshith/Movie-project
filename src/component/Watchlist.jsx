@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import genre from '../utility/genre';
 
-function Watchlist({ watchlist, handleRemoveFromWatchList }) {
+function Watchlist({ watchlist, handleRemoveFromWatchList, setWatchlist }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortedWatchlist, setSortedWatchlist] = useState(watchlist);
   const [genreList, setGenreList] = useState(['All Genres']);
@@ -12,14 +12,14 @@ function Watchlist({ watchlist, handleRemoveFromWatchList }) {
     setSortedWatchlist(watchlist);
   }, [watchlist]);
 
+  useEffect(() => {
+    const temp = watchlist.map((movieObj) => genre[movieObj.genre_ids[0]]);
+    setGenreList(['All Genres', ...new Set(temp)]);
+  }, [watchlist]);
+
   const handleFilter = (genre) => {
     setCurGenre(genre);
   };
-
-  useEffect(() => {
-    const temp = watchlist.map((movieObj) => genre[movieObj.genre_ids[0]]);
-    setGenreList(['All Genres', ...new Set(temp)]); // Use Set to avoid duplicates
-  }, [watchlist]);
 
   const filteredWatchlist = sortedWatchlist.filter((movie) => {
     const matchesTitle = movie.title.toLowerCase().includes(searchQuery.toLowerCase());
@@ -148,8 +148,8 @@ function Watchlist({ watchlist, handleRemoveFromWatchList }) {
       </div>
 
       {showNotification && (
-        <div className='fixed top-0 right-0 mt-4 mr-4 bg-gray-500 text-white p-4 rounded shadow-lg'>
-        Deleted Sucessfully
+        <div className='fixed top-0 right-0 mt-4 mr-4 bg-green-500 text-white p-4 rounded shadow-lg'>
+          Deleted Successfully 🗑️
         </div>
       )}
     </>
