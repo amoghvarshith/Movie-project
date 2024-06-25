@@ -6,6 +6,7 @@ function Watchlist({ watchlist, handleRemoveFromWatchList }) {
   const [sortedWatchlist, setSortedWatchlist] = useState(watchlist);
   const [genreList, setGenreList] = useState(['All Genres']);
   const [curGenre, setCurGenre] = useState('All Genres');
+  const [showNotification, setShowNotification] = useState(false);
 
   useEffect(() => {
     setSortedWatchlist(watchlist);
@@ -52,6 +53,12 @@ function Watchlist({ watchlist, handleRemoveFromWatchList }) {
       (movieA, movieB) => movieB.popularity - movieA.popularity
     );
     setSortedWatchlist(sortedDecreasing);
+  };
+
+  const handleRemoveAndNotify = (movie) => {
+    handleRemoveFromWatchList(movie);
+    setShowNotification(true);
+    setTimeout(() => setShowNotification(false), 3000); // Hide notification after 3 seconds
   };
 
   return (
@@ -130,7 +137,7 @@ function Watchlist({ watchlist, handleRemoveFromWatchList }) {
                 <td>{genre[movieObj.genre_ids[0]]}</td>
                 <td
                   className='text-red-800 cursor-pointer'
-                  onClick={() => handleRemoveFromWatchList(movieObj)}
+                  onClick={() => handleRemoveAndNotify(movieObj)}
                 >
                   Delete
                 </td>
@@ -139,6 +146,12 @@ function Watchlist({ watchlist, handleRemoveFromWatchList }) {
           </tbody>
         </table>
       </div>
+
+      {showNotification && (
+        <div className='fixed top-0 right-0 mt-4 mr-4 bg--500 text-white p-4 rounded shadow-lg'>
+        Deleted Sucessfully
+        </div>
+      )}
     </>
   );
 }
