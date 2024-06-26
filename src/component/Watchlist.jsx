@@ -56,6 +56,10 @@ function Watchlist({ watchlist, handleRemoveFromWatchList, setWatchlist }) {
   };
 
   const handleRemoveAndNotify = (movie) => {
+    const deletedHistory = JSON.parse(localStorage.getItem('deletedHistory')) || [];
+    const updatedHistory = [...deletedHistory, { ...movie, image: `https://image.tmdb.org/t/p/original/${movie.backdrop_path}` }];
+    localStorage.setItem('deletedHistory', JSON.stringify(updatedHistory));
+
     handleRemoveFromWatchList(movie);
     setShowNotification(true);
     setTimeout(() => setShowNotification(false), 3000); // Hide notification after 3 seconds
