@@ -5,69 +5,85 @@ import Movies from './component/Movies';
 import Watchlist from './component/Watchlist';
 import History from './component/History';
 import Banner from './component/Banner';
+import LoginPage from './component/LoginPage';
+import CreateAccountPage from './component/CreateAccountPage';
 
 function App() {
-  let [watchlist, setWatchlist] = useState([]);
+  const [watchlist, setWatchlist] = useState([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  let handleAddWatchlist = (movieObj) => {
-    let newWatchlist = [...watchlist, movieObj];
+  const handleAddWatchlist = (movieObj) => {
+    const newWatchlist = [...watchlist, movieObj];
     localStorage.setItem('movieApp', JSON.stringify(newWatchlist));
     setWatchlist(newWatchlist);
     console.log(newWatchlist);
   };
 
-  let handleRemoveFromWatchList = (movieObj) => {
-    let filteredWatchList = watchlist.filter((movie) => {
-      return movie.id !== movieObj.id;
-    });
+  const handleRemoveFromWatchList = (movieObj) => {
+    const filteredWatchList = watchlist.filter((movie) => movie.id !== movieObj.id);
     setWatchlist(filteredWatchList);
     console.log(filteredWatchList);
 
-    // Add to deleted history only if it doesn't already exist
     let deletedHistory = JSON.parse(localStorage.getItem('deletedHistory')) || [];
-    if (!deletedHistory.some(movie => movie.id === movieObj.id)) {
+    if (!deletedHistory.some((movie) => movie.id === movieObj.id)) {
       deletedHistory = [...deletedHistory, movieObj];
       localStorage.setItem('deletedHistory', JSON.stringify(deletedHistory));
     }
   };
 
   useEffect(() => {
-    let movieFromLocalStorage = localStorage.getItem('movieApp');
-    if (!movieFromLocalStorage) {
-      return;
+    const movieFromLocalStorage = localStorage.getItem('movieApp');
+    if (movieFromLocalStorage) {
+      setWatchlist(JSON.parse(movieFromLocalStorage));
     }
-    setWatchlist(JSON.parse(movieFromLocalStorage));
   }, []);
 
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+  };
+
   return (
-    <>
-      <BrowserRouter>
-        <Navbar />
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <>
-                <Banner />
-                <Movies
-                  handleAddWatchlist={handleAddWatchlist}
-                  handleRemoveFromWatchList={handleRemoveFromWatchList}
+    <BrowserRouter>
+      {isLoggedIn ? (
+        <>
+          <Navbar />
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <>
+                  <Banner />
+                  <Movies
+                    handleAddWatchlist={handleAddWatchlist}
+                    handleRemoveFromWatchList={handleRemoveFromWatchList}
+                    watchlist={watchlist}
+                  />
+                </>
+              }
+            />
+            <Route
+              path="/Watchlist"
+              element={
+                <Watchlist
                   watchlist={watchlist}
+                  handleRemoveFromWatchList={handleRemoveFromWatchList}
+                  setWatchlist={setWatchlist}
                 />
-              </>
-            }
-          />
-          <Route
-            path="/Watchlist"
-            element={<Watchlist watchlist={watchlist} handleRemoveFromWatchList={handleRemoveFromWatchList} setWatchlist={setWatchlist} />}
-          />
-          <Route
-            path="/History"
-            element={<History />}
-          />
+              }
+            />
+            <Route
+              path="/History"
+              element={<History />}
+            />
+          </Routes>
+        </>
+      ) : (
+        <Routes>
+          <Route path="/" element={<LoginPage onLogin={handleLogin} />} />
+          <Route path="/create-account" element={<CreateAccountPage />} />
         </Routes>
-      </BrowserRouter>
-    </>
+      )}
+    </BrowserRouter>
   );
 }
 

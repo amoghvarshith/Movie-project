@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import genre from '../utility/genre';
+import confetti from 'canvas-confetti';
 
 const History = () => {
   const [deletedHistory, setDeletedHistory] = useState([]);
@@ -12,6 +13,13 @@ const History = () => {
   const clearHistory = () => {
     localStorage.removeItem('deletedHistory');
     setDeletedHistory([]);
+
+    // Trigger confetti effect
+    confetti({
+      particleCount: 1000,
+      spread: 100,
+      origin: { y: 0.6 }
+    });
   };
 
   return (
@@ -43,15 +51,12 @@ const History = () => {
                 <td className='px-4 py-4'>{movie.title}</td>
                 <td>{genre[movie.genre_ids[0]]}</td>
               </tr>
-              
             ))
           ) : (
             <tr>
               <td colSpan='3' className='py-4'>No history available</td>
             </tr>
-            
           )}
-          
         </tbody>
       </table>
     </div>
