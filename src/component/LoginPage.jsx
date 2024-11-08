@@ -1,27 +1,37 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 function LoginPage({ onLogin }) {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleLoginClick = () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setLoading(true);
-    const storedUsers = JSON.parse(localStorage.getItem('users')) || [];
-    const user = storedUsers.find(user => user.username === email && user.password === password);
+    try {
+      const response = await axios.post('http://localhost:3000/login', {
+        username,
+        password,
+      });
 
-    setTimeout(() => { // Simulating network request
-      if (user) {
+      if (response.data.message === 'Success') {
         onLogin();
         setLoading(false);
+        navigate('/Navbar');
       } else {
-        setError('Invalid email or password');
+        setError(response.data.message);
         setLoading(false);
       }
-    }, 1000); // Delay for demonstration
+    } catch (error) {
+      console.error('Error logging in:', error);
+      setError('An error occurred during login');
+      setLoading(false);
+    }
   };
 
   const handleCreateAccountClick = () => {
@@ -33,7 +43,7 @@ function LoginPage({ onLogin }) {
       className="relative h-screen flex justify-center items-center"
       style={{ backgroundImage: 'url(https://t3.ftcdn.net/jpg/05/12/72/20/360_F_512722061_EPiFDLgruqbfOAqOeetKGp78fNcG8mai.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }}
     >
-      <div className="relative z-10 bg-black bg-opacity-70 p-8 rounded-md text-white max-w-xs w-full">
+      <form onSubmit={handleSubmit} className="relative z-10 bg-black bg-opacity-70 p-8 rounded-md text-white max-w-xs w-full">
         {loading ? (
           <div className="flex justify-center items-center h-48">
             <div className="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 border-t-blue-500 animate-spin"></div>
@@ -43,9 +53,9 @@ function LoginPage({ onLogin }) {
             {error && <div className="mb-4 text-red-600">{error}</div>}
             <input
               type="text"
-              placeholder="Email or phone number"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               className="block w-full mb-4 p-2 bg-gray-700 rounded text-white focus:outline-none"
             />
             <input
@@ -56,12 +66,13 @@ function LoginPage({ onLogin }) {
               className="block w-full mb-4 p-2 bg-gray-700 rounded text-white focus:outline-none"
             />
             <button 
+              type="submit"
               className="block w-full p-2 mb-4 bg-red-600 rounded text-white font-semibold"
-              onClick={handleLoginClick}
             >
               Sign In
             </button>
             <button 
+              type="button"
               className="block w-full p-2 mb-4 bg-green-600 rounded text-white font-semibold"
               onClick={handleCreateAccountClick}
             >
@@ -69,7 +80,7 @@ function LoginPage({ onLogin }) {
             </button>
           </>
         )}
-      </div>
+      </form>
     </div>
   );
 }

@@ -11,6 +11,7 @@ import CreateAccountPage from './component/CreateAccountPage';
 function App() {
   const [watchlist, setWatchlist] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [searchQuery, setSearchQuery] = useState(''); // State to hold the search query
 
   const handleAddWatchlist = (movieObj) => {
     const newWatchlist = [...watchlist, movieObj];
@@ -46,7 +47,8 @@ function App() {
     <BrowserRouter>
       {isLoggedIn ? (
         <>
-          <Navbar />
+          {/* Pass setSearchQuery to Navbar */}
+          <Navbar setSearchQuery={setSearchQuery} />
           <Routes>
             <Route
               path="/"
@@ -57,6 +59,7 @@ function App() {
                     handleAddWatchlist={handleAddWatchlist}
                     handleRemoveFromWatchList={handleRemoveFromWatchList}
                     watchlist={watchlist}
+                    searchQuery={searchQuery} // Pass searchQuery to Movies
                   />
                 </>
               }

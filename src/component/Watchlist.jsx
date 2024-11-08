@@ -152,10 +152,11 @@ function Watchlist({ watchlist, handleRemoveFromWatchList, setWatchlist }) {
       </div>
 
       {showNotification && (
-        <div className='fixed top-0 right-0 mt-4 mr-4 bg-green-500 text-white p-4 rounded shadow-lg'>
-          Deleted Successfully 🗑️
-        </div>
-      )}
+  <div className='fixed top-0 left-1/2 transform -translate-x-1/2 transition-transform duration-500 ease-in-out bg-green-500 text-white p-4 rounded shadow-lg'>
+    <span className="font-bold">Deleted Successfully</span>
+  </div>
+)}
+
     </>
   );
 }
