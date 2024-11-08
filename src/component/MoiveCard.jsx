@@ -1,34 +1,37 @@
+// MovieCard.js
 import React from 'react';
-import ReactDOM from 'react-dom';
-import Watchlist from './Watchlist';
+import { useNavigate } from 'react-router-dom';
 
 function MovieCard({ movieObj, poster_path, name, handleAddWatchlist, handleRemoveFromWatchList, watchlist }) {
+  const navigate = useNavigate();
+
   function doesContain(movieObj) {
-    for (let i = 0; i < watchlist.length; i++) {
-      if (watchlist[i].id === movieObj.id) {
-        return true;
-      }
-    }
-    return false;
+    return watchlist.some(watchlistMovie => watchlistMovie.id === movieObj.id);
   }
 
   return (
     <div
+      onClick={() => navigate(`/movie/${movieObj.id}`)}
       className='relative h-[55vh] w-[200px] bg-center bg-cover rounded-xl hover:scale-110 duration-300 cursor-pointer'
       style={{ backgroundImage: `url(https://image.tmdb.org/t/p/original/${poster_path})` }}
     >
       {doesContain(movieObj) ? (
-
         <div 
-          onClick={() => { handleRemoveFromWatchList(movieObj) }} 
+          onClick={(e) => { 
+            e.stopPropagation();
+            handleRemoveFromWatchList(movieObj);
+          }} 
           className='absolute top-2 right-2 flex justify-center h-8 w-8 items-center rounded-lg' 
           style={{ border: "1px solid black" }}
         >
-         &#10060;
+          &#10060;
         </div>
       ) : (
         <div 
-          onClick={() => { handleAddWatchlist(movieObj) }} 
+          onClick={(e) => { 
+            e.stopPropagation();
+            handleAddWatchlist(movieObj);
+          }} 
           className='absolute top-2 right-2 flex justify-center h-8 w-8 items-center rounded-lg' 
           style={{ border: "1px solid black" }}
         >

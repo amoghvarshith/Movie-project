@@ -51,7 +51,7 @@ const Navbar = ({ setSearchQuery }) => {
         </div>
 
         {/* Logout button */}
-        <Link to="/login">
+        <Link to="/">
           <FontAwesomeIcon icon={faRightFromBracket} className="text-3xl text-white cursor-pointer" />
         </Link>
       </div>

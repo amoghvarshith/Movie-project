@@ -7,37 +7,46 @@ import History from './component/History';
 import Banner from './component/Banner';
 import LoginPage from './component/LoginPage';
 import CreateAccountPage from './component/CreateAccountPage';
+import MovieDetailPage from './component/MovieDetailPage'; // Import the MovieDetailPage component
 
 function App() {
   const [watchlist, setWatchlist] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [searchQuery, setSearchQuery] = useState(''); // State to hold the search query
+  const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    // Load the watchlist from localStorage when the app loads
+    const savedWatchlist = localStorage.getItem('movieApp');
+    if (savedWatchlist) {
+      setWatchlist(JSON.parse(savedWatchlist));
+    }
+  }, []);
+
+  useEffect(() => {
+    // Save the updated watchlist to localStorage whenever it changes
+    localStorage.setItem('movieApp', JSON.stringify(watchlist));
+  }, [watchlist]);
 
   const handleAddWatchlist = (movieObj) => {
-    const newWatchlist = [...watchlist, movieObj];
-    localStorage.setItem('movieApp', JSON.stringify(newWatchlist));
-    setWatchlist(newWatchlist);
-    console.log(newWatchlist);
+    // Add a movie to the watchlist
+    if (!watchlist.some(movie => movie.id === movieObj.id)) {
+      const updatedWatchlist = [...watchlist, movieObj];
+      setWatchlist(updatedWatchlist);
+    }
   };
 
   const handleRemoveFromWatchList = (movieObj) => {
-    const filteredWatchList = watchlist.filter((movie) => movie.id !== movieObj.id);
-    setWatchlist(filteredWatchList);
-    console.log(filteredWatchList);
+    // Remove a movie from the watchlist
+    const updatedWatchlist = watchlist.filter(movie => movie.id !== movieObj.id);
+    setWatchlist(updatedWatchlist);
 
+    // Manage deleted history in localStorage
     let deletedHistory = JSON.parse(localStorage.getItem('deletedHistory')) || [];
-    if (!deletedHistory.some((movie) => movie.id === movieObj.id)) {
+    if (!deletedHistory.some(movie => movie.id === movieObj.id)) {
       deletedHistory = [...deletedHistory, movieObj];
       localStorage.setItem('deletedHistory', JSON.stringify(deletedHistory));
     }
   };
-
-  useEffect(() => {
-    const movieFromLocalStorage = localStorage.getItem('movieApp');
-    if (movieFromLocalStorage) {
-      setWatchlist(JSON.parse(movieFromLocalStorage));
-    }
-  }, []);
 
   const handleLogin = () => {
     setIsLoggedIn(true);
@@ -47,7 +56,7 @@ function App() {
     <BrowserRouter>
       {isLoggedIn ? (
         <>
-          {/* Pass setSearchQuery to Navbar */}
+          {/* Navbar is visible only when logged in */}
           <Navbar setSearchQuery={setSearchQuery} />
           <Routes>
             <Route
@@ -59,24 +68,24 @@ function App() {
                     handleAddWatchlist={handleAddWatchlist}
                     handleRemoveFromWatchList={handleRemoveFromWatchList}
                     watchlist={watchlist}
-                    searchQuery={searchQuery} // Pass searchQuery to Movies
+                    searchQuery={searchQuery}
                   />
                 </>
               }
             />
             <Route
-              path="/Watchlist"
+              path="/watchlist"
               element={
                 <Watchlist
                   watchlist={watchlist}
                   handleRemoveFromWatchList={handleRemoveFromWatchList}
-                  setWatchlist={setWatchlist}
                 />
               }
             />
+            <Route path="/history" element={<History />} />
             <Route
-              path="/History"
-              element={<History />}
+              path="/movie/:id"
+              element={<MovieDetailPage />}
             />
           </Routes>
         </>

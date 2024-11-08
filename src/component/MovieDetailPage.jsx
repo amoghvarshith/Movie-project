@@ -1,25 +1,29 @@
+// MovieDetailPage.js
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 
-function MovieDetail() {
+function MovieDetailPage() {
   const { id } = useParams();
   const [movie, setMovie] = useState(null);
   const [videos, setVideos] = useState([]);
   const [cast, setCast] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const API_KEY = '4cf5c7edf5a7a80e0b71d77f1a8b2a5d';
 
   useEffect(() => {
     const fetchMovieDetails = async () => {
       try {
+        setLoading(true);
+        
         // Fetch movie details
         const movieResponse = await axios.get(`https://api.themoviedb.org/3/movie/${id}`, {
           params: { api_key: API_KEY, language: 'en-US' },
         });
         setMovie(movieResponse.data);
 
-        // Fetch videos
+        // Fetch trailers
         const videoResponse = await axios.get(`https://api.themoviedb.org/3/movie/${id}/videos`, {
           params: { api_key: API_KEY },
         });
@@ -29,20 +33,27 @@ function MovieDetail() {
         const creditsResponse = await axios.get(`https://api.themoviedb.org/3/movie/${id}/credits`, {
           params: { api_key: API_KEY },
         });
-        setCast(creditsResponse.data.cast.slice(0, 10)); // Display only first 10 cast members
+        setCast(creditsResponse.data.cast.slice(0, 10));
+        
       } catch (error) {
         console.error("Error fetching movie details:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchMovieDetails();
   }, [id]);
 
+  if (loading) {
+    return <div className="text-center text-xl p-8 text-white">Loading...</div>;
+  }
+
   return (
     <div className="bg-black text-white min-h-screen">
       {movie ? (
         <div>
-          {/* Hero Section */}
+          {/* Movie Banner */}
           <div className="relative bg-cover bg-center h-[500px]" style={{ backgroundImage: `url(https://image.tmdb.org/t/p/original/${movie.backdrop_path})` }}>
             <div className="absolute inset-0 bg-gradient-to-b from-black opacity-70"></div>
             <div className="relative z-10 flex items-center justify-start h-full p-8">
@@ -55,6 +66,7 @@ function MovieDetail() {
                 <div className="text-white mt-4 md:mt-0">
                   <h1 className="text-4xl md:text-5xl font-semibold">{movie.title}</h1>
                   <p className="text-lg md:text-xl mt-2">{movie.release_date} | {movie.runtime} mins</p>
+                  <p className="text-lg mt-4">{movie.overview}</p>
                 </div>
               </div>
             </div>
@@ -62,57 +74,30 @@ function MovieDetail() {
 
           {/* Movie Info Section */}
           <div className="p-8 space-y-6">
-            {/* Genres */}
             <div>
               <h2 className="text-2xl font-semibold">Genres</h2>
-              <p className="text-lg">{movie.genres.map(genre => genre.name).join(', ')}</p>
+              <p className="text-lg">{movie.genres?.map(genre => genre.name).join(', ') || "N/A"}</p>
             </div>
-
-            {/* Production Companies */}
             <div>
               <h2 className="text-2xl font-semibold">Production Companies</h2>
-              <p className="text-lg">{movie.production_companies.map(company => company.name).join(', ')}</p>
+              <p className="text-lg">{movie.production_companies?.map(company => company.name).join(', ') || "N/A"}</p>
             </div>
-
-            {/* Budget */}
             <div>
               <h2 className="text-2xl font-semibold">Budget</h2>
-              <p className="text-lg">${movie.budget.toLocaleString()}</p>
+              <p className="text-lg">${movie.budget?.toLocaleString() || "N/A"}</p>
             </div>
-
-            {/* Revenue */}
             <div>
               <h2 className="text-2xl font-semibold">Revenue</h2>
-              <p className="text-lg">${movie.revenue.toLocaleString()}</p>
-            </div>
-
-            {/* Director */}
-            <div>
-              <h2 className="text-2xl font-semibold">Director</h2>
-              <p className="text-lg">
-                {cast.find(member => member.job === 'Director')?.name || 'N/A'}
-              </p>
-            </div>
-
-            {/* Tagline */}
-            <div>
-              <h2 className="text-2xl font-semibold">Tagline</h2>
-              <p className="text-lg">{movie.tagline || 'No tagline available'}</p>
-            </div>
-
-            {/* Overview */}
-            <div>
-              <h2 className="text-2xl font-semibold">Overview</h2>
-              <p className="text-lg">{movie.overview}</p>
+              <p className="text-lg">${movie.revenue?.toLocaleString() || "N/A"}</p>
             </div>
           </div>
 
-          {/* Videos Section (Limited to 4 Videos) */}
+          {/* Trailers Section */}
           <div className="p-8">
             <h2 className="text-2xl font-semibold mb-4">Watch Trailers</h2>
             {videos.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {videos.slice(0, 4).map((video) => (
+                {videos.map(video => (
                   <div key={video.id} className="flex justify-center">
                     <iframe
                       title={video.name}
@@ -134,7 +119,7 @@ function MovieDetail() {
           <div className="p-8">
             <h2 className="text-2xl font-semibold mb-4">Cast</h2>
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-6">
-              {cast.map((actor) => (
+              {cast.map(actor => (
                 <div key={actor.cast_id} className="text-center">
                   <img
                     src={`https://image.tmdb.org/t/p/w200/${actor.profile_path}`}
@@ -149,10 +134,10 @@ function MovieDetail() {
           </div>
         </div>
       ) : (
-        <p className="text-center text-xl p-8">Loading...</p>
+        <p className="text-center text-xl p-8 text-white">Movie not found</p>
       )}
     </div>
   );
 }
 
-export default MovieDetail;
+export default MovieDetailPage;
